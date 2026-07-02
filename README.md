@@ -73,6 +73,19 @@ pre-LayerNorm residual connections, stacked into encoder blocks.
 The full `VisionTransformer` classifies from the `[CLS]` token; a small config
 (3 layers, 3 heads) trained for 5 epochs on MNIST reaches **92% test accuracy**.
 
+## Datasets
+
+**[Tiny Shakespeare](https://github.com/karpathy/char-rnn)** (jimmy-gpt2)\
+A ~1 MB plain-text corpus of Shakespeare's plays, popularized by Andrej
+Karpathy's char-rnn. Included in the repo at `jimmy-gpt2/datasets/input.txt`
+and used for the GPT-2 training forward pass.
+
+**[MNIST](https://yann.lecun.com/exdb/mnist/)** (ViT)\
+The classic handwritten-digit dataset (60k train / 10k test, 28x28 grayscale)
+created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges. Downloaded
+automatically by `torchvision` into an untracked `datasets/` directory the
+first time the ViT notebook runs, and used to train the ViT classifier.
+
 ## Repository structure
 
 ```
@@ -87,9 +100,6 @@ The full `VisionTransformer` classifies from the `[CLS]` token; a small config
     ├── vit_figure.png          # Architecture figure from the ViT paper
     └── *.jpeg                  # Sample image for the patch/embedding demos
 ```
-
-MNIST downloads into an untracked `datasets/` directory at the repo root the
-first time the ViT notebook runs.
 
 ## Setup
 
