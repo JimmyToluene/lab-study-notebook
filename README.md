@@ -80,7 +80,7 @@ A ~1 MB plain-text corpus of Shakespeare's plays, popularized by Andrej
 Karpathy's char-rnn. Included in the repo at `jimmy-gpt2/datasets/input.txt`
 and used for the GPT-2 training forward pass.
 
-**[MNIST](https://yann.lecun.com/exdb/mnist/)** (ViT)\
+**[MNIST](http://yann.lecun.com/exdb/mnist/)** (ViT)\
 The classic handwritten-digit dataset (60k train / 10k test, 28x28 grayscale)
 created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges. Downloaded
 automatically by `torchvision` into an untracked `datasets/` directory the
