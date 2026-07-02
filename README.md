@@ -36,17 +36,33 @@ Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.
 built up module by module in [`ViT_notes.ipynb`](ViT/ViT_notes.ipynb) and
 trained end to end on MNIST.
 
-- **Patch embedding**: a strided `Conv2d` that maps an image `(B, C, H, W)` to
-  a token sequence `(B, num_patches, d_model)`, with visualizations of the
-  image cut into patches and a PCA-to-RGB view of the resulting embeddings
-- **Positional encoding**: a learnable `[CLS]` token prepended to the sequence,
-  plus sinusoidal position encodings from "Attention Is All You Need"
-- **Transformer encoder**: multi-head self-attention (batched QKV projection,
-  `scaled_dot_product_attention` without a causal mask), a GELU MLP, and
-  pre-LayerNorm residual connections, stacked into encoder blocks
-- **Classification**: the full `VisionTransformer` classifies from the `[CLS]`
-  token; a small config (3 layers, 3 heads) trained for 5 epochs on MNIST
-  reaches **92% test accuracy**
+<p align="center">
+  <img src="ViT/vit_figure.png" alt="ViT architecture" width="720">
+</p>
+<p align="center">
+  <em>The ViT architecture (Figure 1 of Dosovitskiy et al., 2020): an image is
+  split into fixed-size patches, linearly embedded, combined with position
+  embeddings and a learnable [class] token, fed through a standard transformer
+  encoder, and classified from the [class] token by an MLP head.</em>
+</p>
+
+**Patch embedding**\
+A strided `Conv2d` that maps an image `(B, C, H, W)` to a token sequence
+`(B, num_patches, d_model)`, with visualizations of the image cut into patches
+and a PCA-to-RGB view of the resulting embeddings.
+
+**Positional encoding**\
+A learnable `[CLS]` token prepended to the sequence, plus sinusoidal position
+encodings from "Attention Is All You Need".
+
+**Transformer encoder**\
+Multi-head self-attention (batched QKV projection,
+`scaled_dot_product_attention` without a causal mask), a GELU MLP, and
+pre-LayerNorm residual connections, stacked into encoder blocks.
+
+**Classification**\
+The full `VisionTransformer` classifies from the `[CLS]` token; a small config
+(3 layers, 3 heads) trained for 5 epochs on MNIST reaches **92% test accuracy**.
 
 ## Repository structure
 
@@ -59,6 +75,7 @@ trained end to end on MNIST.
 │   └── notebooks/              # Step-by-step walkthrough notebooks
 └── ViT/
     ├── ViT_notes.ipynb         # ViT built module by module, trained on MNIST
+    ├── vit_figure.png          # Architecture figure from the ViT paper
     └── *.jpeg                  # Sample image for the patch/embedding demos
 ```
 
