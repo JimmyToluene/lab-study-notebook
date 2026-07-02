@@ -30,19 +30,23 @@ with HuggingFace's pretrained checkpoints.
 See the project's own [README](jimmy-gpt2/README.md) for architecture details
 and usage.
 
-### 2. [ViT](ViT/): Vision Transformer from scratch (in progress)
+### 2. [ViT](ViT/): Vision Transformer from scratch
 
 Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929)),
-built up module by module in [`ViT_notes.ipynb`](ViT/ViT_notes.ipynb).
+built up module by module in [`ViT_notes.ipynb`](ViT/ViT_notes.ipynb) and
+trained end to end on MNIST.
 
-- **Patch embedding**: implemented as a strided `Conv2d` that maps an image
-  `(B, C, H, W)` to a token sequence `(B, num_patches, d_model)`, with
-  visualizations of the image cut into patches and a PCA-to-RGB view of the
-  resulting embeddings
-- **Positional embedding**: a learnable `[CLS]` token plus sinusoidal position
-  encodings (currently being implemented)
-- Planned: multi-head self-attention, the transformer encoder, and a
-  classification head to complete the model
+- **Patch embedding**: a strided `Conv2d` that maps an image `(B, C, H, W)` to
+  a token sequence `(B, num_patches, d_model)`, with visualizations of the
+  image cut into patches and a PCA-to-RGB view of the resulting embeddings
+- **Positional encoding**: a learnable `[CLS]` token prepended to the sequence,
+  plus sinusoidal position encodings from "Attention Is All You Need"
+- **Transformer encoder**: multi-head self-attention (batched QKV projection,
+  `scaled_dot_product_attention` without a causal mask), a GELU MLP, and
+  pre-LayerNorm residual connections, stacked into encoder blocks
+- **Classification**: the full `VisionTransformer` classifies from the `[CLS]`
+  token; a small config (3 layers, 3 heads) trained for 5 epochs on MNIST
+  reaches **92% test accuracy**
 
 ## Repository structure
 
@@ -54,9 +58,12 @@ built up module by module in [`ViT_notes.ipynb`](ViT/ViT_notes.ipynb).
 │   ├── datasets/input.txt      # Tiny Shakespeare corpus
 │   └── notebooks/              # Step-by-step walkthrough notebooks
 └── ViT/
-    ├── ViT_notes.ipynb         # ViT built module by module, with visualizations
+    ├── ViT_notes.ipynb         # ViT built module by module, trained on MNIST
     └── *.jpeg                  # Sample image for the patch/embedding demos
 ```
+
+MNIST downloads into an untracked `datasets/` directory at the repo root the
+first time the ViT notebook runs.
 
 ## Setup
 
