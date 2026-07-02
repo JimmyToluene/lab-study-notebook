@@ -1,0 +1,9 @@
+torch==2.12.1
+torchvision==0.27.1
+transformers==5.12.1
+tiktoken==0.13.0
+numpy==2.5.0
+matplotlib==3.11.0
+pillow==12.2.0
+ipykernel==7.3.0
+jupyter
