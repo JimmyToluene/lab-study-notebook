@@ -82,9 +82,11 @@ and used for the GPT-2 training forward pass.
 
 **[MNIST](https://en.wikipedia.org/wiki/MNIST_database)** (ViT)\
 The classic handwritten-digit dataset (60k train / 10k test, 28x28 grayscale)
-created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges. Downloaded
-automatically by `torchvision` into an untracked `datasets/` directory the
-first time the ViT notebook runs, and used to train the ViT classifier.
+created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges, and
+introduced in ["Gradient-Based Learning Applied to Document Recognition"](http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf)
+(LeCun et al., Proc. IEEE 1998), the LeNet-5 paper. Downloaded automatically
+by `torchvision` into an untracked `datasets/` directory the first time the
+ViT notebook runs, and used to train the ViT classifier.
 
 ## Repository structure
 
