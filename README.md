@@ -3,15 +3,12 @@
 **Author:** Haozhe (Jimmy) Jia, Boston University
 
 A collection of deep-learning study projects I built during my time in the
-[Kolachalama Lab](https://vkola-lab.github.io/) at Boston University. Each
-subproject reimplements a foundational architecture from scratch in PyTorch,
-with notebooks that walk through every building block, verify tensor shapes at
-each step, and visualize intermediate results. This repository doubles as my
-portfolio of hands-on model implementations.
+[Kolachalama Lab](https://vkola-lab.github.io/) at Boston University.
+The subprojects are mainly for large scale Transformer based model in Computer Vision and NLP field 
 
 ## Projects
-
-### 1. [jimmy-gpt2](jimmy-gpt2/): GPT-2 from scratch
+### NLP Side:
+#### 1. [jimmy-gpt2](jimmy-gpt2/): GPT-2 from scratch
 
 A from-scratch reimplementation of the GPT-2 transformer, weight-compatible
 with HuggingFace's pretrained checkpoints, following Andrej Karpathy's
@@ -32,7 +29,8 @@ video.
 See the project's own [README](jimmy-gpt2/README.md) for architecture details
 and usage.
 
-### 2. [ViTransformer](ViTransformer/): Vision Transformer from scratch
+### Computer Vision Side:
+#### 2. [ViTransformer](ViTransformer/): Vision Transformer from scratch
 
 Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929)),
 built up module by module in [`ViT_notes.ipynb`](ViTransformer/ViT_notes.ipynb)
