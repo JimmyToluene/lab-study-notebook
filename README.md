@@ -14,7 +14,9 @@ portfolio of hands-on model implementations.
 ### 1. [jimmy-gpt2](jimmy-gpt2/): GPT-2 from scratch
 
 A from-scratch reimplementation of the GPT-2 transformer, weight-compatible
-with HuggingFace's pretrained checkpoints.
+with HuggingFace's pretrained checkpoints, following Andrej Karpathy's
+["Let's reproduce GPT-2 (124M)"](https://www.youtube.com/watch?v=l8pRSuU81PU)
+video.
 
 - Core blocks built bottom-up: causal self-attention, GELU MLP, pre-LayerNorm
   transformer block, and the full GPT model (token and positional embeddings,

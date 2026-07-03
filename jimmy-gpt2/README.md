@@ -76,4 +76,7 @@ jupyter notebook notebooks/playground.ipynb
 
 ## Acknowledgements
 
-Inspired by Andrej Karpathy's "Let's build GPT" / nanoGPT walkthroughs.
+This project follows Andrej Karpathy's video
+["Let's reproduce GPT-2 (124M)"](https://www.youtube.com/watch?v=l8pRSuU81PU)
+(Jun 2024) and its companion repo
+[build-nanogpt](https://github.com/karpathy/build-nanogpt).
