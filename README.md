@@ -64,7 +64,7 @@ $$
 
 Each position $pos$ gets a fixed vector of interleaved sines and cosines at
 geometrically decreasing frequencies, added to the token embedding at the
-input: $x'_{pos} = x_{pos} + PE_{pos}$.
+input: $\text{x'}_{pos} = x_{pos} + PE_{pos}$.
 
 **Transformer encoder**\
 Multi-head self-attention (batched QKV projection,
