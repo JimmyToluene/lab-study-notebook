@@ -55,10 +55,10 @@ and a PCA-to-RGB view of the resulting embeddings.
 A learnable `[CLS]` token prepended to the sequence, plus sinusoidal position
 encodings from "Attention Is All You Need":
 
-```math
+$$
 PE_{(pos,\,2k)} = \sin\!\left(\frac{pos}{10000^{2k/d_{model}}}\right), \qquad
 PE_{(pos,\,2k+1)} = \cos\!\left(\frac{pos}{10000^{2k/d_{model}}}\right)
-```
+$$
 
 Each position $pos$ gets a fixed vector of interleaved sines and cosines at
 geometrically decreasing frequencies, added to the token embedding at the
