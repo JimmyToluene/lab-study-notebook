@@ -39,7 +39,7 @@ importable [`vit/`](ViTransformer/vit/) package (patch embedding, positional
 encoding, multi-head attention).
 
 <p align="center">
-  <img src="ViTransformer/vit_figure.png" alt="ViT architecture" width="720">
+  <img src="ViTransformer/assets/vit_figure.png" alt="ViT architecture" width="720">
 </p>
 <p align="center">
   <em>The ViT architecture (Figure 1 of Dosovitskiy et al., 2020): an image is
@@ -105,8 +105,9 @@ ViT notebook runs, and used to train the ViT classifier.
     │   ├── patch_embed.py      # PatchEmbedding (strided-Conv2d patchifier)
     │   ├── pos_encoding.py     # [CLS] token + sinusoidal positional encoding
     │   └── attention.py        # Multi-head self-attention
-    ├── vit_figure.png          # Architecture figure from the ViT paper
-    └── *.jpeg                  # Sample image for the patch/embedding demos
+    └── assets/                 # Static images
+        ├── vit_figure.png      # Architecture figure from the ViT paper
+        └── *.jpeg              # Sample image for the patch/embedding demos
 ```
 
 ## Setup
