@@ -30,14 +30,16 @@ with HuggingFace's pretrained checkpoints.
 See the project's own [README](jimmy-gpt2/README.md) for architecture details
 and usage.
 
-### 2. [ViT](ViT/): Vision Transformer from scratch
+### 2. [ViTransformer](ViTransformer/): Vision Transformer from scratch
 
 Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929)),
-built up module by module in [`ViT_notes.ipynb`](ViT/ViT_notes.ipynb) and
-trained end to end on MNIST.
+built up module by module in [`ViT_notes.ipynb`](ViTransformer/ViT_notes.ipynb)
+and trained end to end on MNIST. The core building blocks are extracted into an
+importable [`vit/`](ViTransformer/vit/) package (patch embedding, positional
+encoding, multi-head attention).
 
 <p align="center">
-  <img src="ViT/vit_figure.png" alt="ViT architecture" width="720">
+  <img src="ViTransformer/vit_figure.png" alt="ViT architecture" width="720">
 </p>
 <p align="center">
   <em>The ViT architecture (Figure 1 of Dosovitskiy et al., 2020): an image is
@@ -80,7 +82,7 @@ A ~1 MB plain-text corpus of Shakespeare's plays, popularized by Andrej
 Karpathy's char-rnn. Included in the repo at `jimmy-gpt2/datasets/input.txt`
 and used for the GPT-2 training forward pass.
 
-**[MNIST](https://en.wikipedia.org/wiki/MNIST_database)** (ViT)\
+**[MNIST](https://en.wikipedia.org/wiki/MNIST_database)** (ViTransformer)\
 The classic handwritten-digit dataset (60k train / 10k test, 28x28 grayscale)
 created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges, and
 introduced in ["Gradient-Based Learning Applied to Document Recognition"](http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf)
@@ -97,8 +99,12 @@ ViT notebook runs, and used to train the ViT classifier.
 │   ├── train_gpt2.py           # Full model, pretrained-weight loading, generation
 │   ├── datasets/input.txt      # Tiny Shakespeare corpus
 │   └── notebooks/              # Step-by-step walkthrough notebooks
-└── ViT/
+└── ViTransformer/
     ├── ViT_notes.ipynb         # ViT built module by module, trained on MNIST
+    ├── vit/                    # Importable package of the core modules
+    │   ├── patch_embed.py      # PatchEmbedding (strided-Conv2d patchifier)
+    │   ├── pos_encoding.py     # [CLS] token + sinusoidal positional encoding
+    │   └── attention.py        # Multi-head self-attention
     ├── vit_figure.png          # Architecture figure from the ViT paper
     └── *.jpeg                  # Sample image for the patch/embedding demos
 ```
