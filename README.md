@@ -51,10 +51,12 @@ and usage.
 #### 2. [ViTransformer](ViTransformer/): Vision Transformer from scratch
 
 Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929)),
-built up module by module in [`ViT_notes.ipynb`](ViTransformer/ViT_notes.ipynb)
-and trained end to end on MNIST. The core building blocks are extracted into an
-importable [`vit/`](ViTransformer/vit/) package (patch embedding, positional
-encoding, transformer encoder).
+built up module by module in [`ViT_notes.ipynb`](ViTransformer/scratch_nbs/ViT_notes.ipynb)
+and trained end to end on MNIST. The building blocks and the full model are
+extracted into an importable [`vit/`](ViTransformer/vit/) package (patch
+embedding, positional encoding, transformer encoder, and the assembled
+`VisionTransformer`), so training scripts can simply do
+`from vit import VisionTransformer`.
 
 <p align="center">
   <img src="ViTransformer/assets/vit_figure.png" alt="ViT architecture" width="720">
@@ -90,8 +92,11 @@ Multi-head self-attention (batched QKV projection,
 pre-LayerNorm residual connections, stacked into encoder blocks.
 
 **Classification**\
-The full `VisionTransformer` classifies from the `[CLS]` token; a small config
-(3 layers, 3 heads) trained for 5 epochs on MNIST reaches **92% test accuracy**.
+The full `VisionTransformer` classifies from the `[CLS]` token, with the
+classification head returning raw logits for `CrossEntropyLoss`.
+[`simple_train_test.py`](ViTransformer/simple_train_test.py) trains the model
+on MNIST and evaluates test accuracy after every epoch; a small config
+(3 layers, 3 heads) trained for 5 epochs reaches **92% test accuracy**.
 
 ## Datasets
 
@@ -106,7 +111,7 @@ created by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges, and
 introduced in ["Gradient-Based Learning Applied to Document Recognition"](http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf)
 (LeCun et al., Proc. IEEE 1998), the LeNet-5 paper. Downloaded automatically
 by `torchvision` into an untracked `datasets/` directory the first time the
-ViT notebook runs, and used to train the ViT classifier.
+ViT notebook or training script runs, and used to train the ViT classifier.
 
 ## Repository structure
 
@@ -119,11 +124,15 @@ ViT notebook runs, and used to train the ViT classifier.
 │   ├── datasets/input.txt      # Tiny Shakespeare corpus
 │   └── notebooks/              # Step-by-step walkthrough notebooks
 └── ViTransformer/
-    ├── ViT_notes.ipynb         # ViT built module by module, trained on MNIST
-    ├── vit/                    # Importable package of the core modules
+    ├── simple_train_test.py    # Trains the ViT on MNIST, reports test accuracy per epoch
+    ├── vit/                    # Importable package of the model and its modules
+    │   ├── __init__.py         # Re-exports VisionTransformer at the package level
+    │   ├── ViT.py              # Full VisionTransformer: embeddings + encoder stack + head
     │   ├── patch_embed.py      # PatchEmbedding (strided-Conv2d patchifier)
     │   ├── pos_encoding.py     # [CLS] token + sinusoidal positional encoding
     │   └── transformer.py      # Multi-head self-attention, GELU FFNN, encoder block
+    ├── scratch_nbs/
+    │   └── ViT_notes.ipynb     # ViT built module by module, trained on MNIST
     └── assets/                 # Static images
         ├── vit_figure.png      # Architecture figure from the ViT paper
         └── *.jpeg              # Sample image for the patch/embedding demos
