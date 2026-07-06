@@ -20,9 +20,47 @@ class MultiHeadAttention(nn.Module):
         k = k.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
         q = q.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
         v = v.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
-
+        # We adpot FlashAttention here.
         y = F.scaled_dot_product_attention(q, k, v, is_causal=False)
         y = y.transpose(1,2).contiguous().view(B,T,C) # re-assemble all head outputs side by side
         # output projection
         y = self.c_proj(y)
         return y
+
+class FFNN(nn.Module):
+    def __init__(self, d_model, r_ffnn):
+        super().__init__()
+        self.c_fc = nn.Linear(d_model, r_ffnn * d_model)
+        self.gelu = nn.GELU()
+        self.c_proj = nn.Linear(r_ffnn * d_model, d_model)
+
+    def forward(self, x):
+        x = self.c_fc(x)
+        x = self.gelu(x)
+        x = self.c_proj(x)
+        return x
+
+class TransformerEncoder(nn.Module):
+    def __init__(self, d_model, n_heads, r_ffnn=4):
+        super().__init__()
+        self.d_model = d_model
+        self.n_heads = n_heads
+
+        # Sub-Layer 1 Normalization
+        self.ln_1 = nn.LayerNorm(d_model)
+        # Multi-Head Attention
+        self.attn = MultiHeadAttention(d_model, n_heads)
+        # Sub-Layer 2 Normalization
+        self.ln_2 = nn.LayerNorm(d_model)
+        # MLP layer
+        self.ffn = FFNN(d_model, r_ffnn)
+
+    def forward(self, x):
+
+        # Residual Connection After Sub-Layer 1
+        x = x + self.attn(self.ln_1(x))
+
+        # Residual Connection After Sub-Layer 2
+        x = x + self.ffn(self.ln_2(x))
+
+        return x

@@ -60,7 +60,7 @@ Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.
 built up module by module in [`ViT_notes.ipynb`](ViTransformer/ViT_notes.ipynb)
 and trained end to end on MNIST. The core building blocks are extracted into an
 importable [`vit/`](ViTransformer/vit/) package (patch embedding, positional
-encoding, multi-head attention).
+encoding, transformer encoder).
 
 <p align="center">
   <img src="ViTransformer/assets/vit_figure.png" alt="ViT architecture" width="720">
@@ -129,7 +129,7 @@ ViT notebook runs, and used to train the ViT classifier.
     ├── vit/                    # Importable package of the core modules
     │   ├── patch_embed.py      # PatchEmbedding (strided-Conv2d patchifier)
     │   ├── pos_encoding.py     # [CLS] token + sinusoidal positional encoding
-    │   └── attention.py        # Multi-head self-attention
+    │   └── transformer.py      # Multi-head self-attention, GELU FFNN, encoder block
     └── assets/                 # Static images
         ├── vit_figure.png      # Architecture figure from the ViT paper
         └── *.jpeg              # Sample image for the patch/embedding demos
