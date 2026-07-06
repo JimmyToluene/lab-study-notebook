@@ -25,5 +25,5 @@ Thumbs.db
 *.ckpt
 
 # MNIST download from the ViT notebook (repo root only;
-# jimmy-gpt2/datasets stays tracked)
+# Jimmy-gpt2/datasets stays tracked)
 /datasets/

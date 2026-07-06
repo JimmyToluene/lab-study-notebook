@@ -18,7 +18,7 @@ Computer Vision fields.
 
 ## Projects
 ### NLP Side:
-#### 1. [jimmy-gpt2](jimmy-gpt2/): GPT-2 from scratch
+#### 1. [jimmy-gpt2](Jimmy-gpt2/): GPT-2 from scratch
 
 A from-scratch reimplementation of the GPT-2 transformer, weight-compatible
 with HuggingFace's pretrained checkpoints, following Andrej Karpathy's
@@ -26,7 +26,7 @@ with HuggingFace's pretrained checkpoints, following Andrej Karpathy's
 video.
 
 <p align="center">
-  <img src="jimmy-gpt2/assets/GPT-2.webp" alt="GPT-2 architecture" width="720">
+  <img src="Jimmy-gpt2/assets/GPT-2.webp" alt="GPT-2 architecture" width="720">
 </p>
 <p align="center">
   <em>The GPT-2 architecture and next-token prediction flow. Figure from
@@ -44,7 +44,7 @@ video.
   experiments, including a look at how the token embedding shares weights with
   the LM head
 
-See the project's own [README](jimmy-gpt2/README.md) for architecture details
+See the project's own [README](Jimmy-gpt2/README.md) for architecture details
 and usage.
 
 ### Computer Vision Side:
