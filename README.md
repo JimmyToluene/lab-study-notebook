@@ -29,14 +29,8 @@ video.
   <img src="jimmy-gpt2/assets/GPT-2.webp" alt="GPT-2 architecture" width="720">
 </p>
 <p align="center">
-  <em>The GPT-2 architecture: input tokens are embedded, combined with
-  positional encodings, passed through 12 stacked transformer blocks (masked
-  multi-head attention, feed-forward network, LayerNorm, residual connections),
-  and projected to vocabulary logits whose softmax predicts the next token.
-  Figure from
-  <a href="https://medium.com/@vipul.koti333/from-theory-to-code-step-by-step-implementation-and-code-breakdown-of-gpt-2-model-7bde8d5cecda">"From
-  Theory to Code: Step-by-Step Implementation and Code Breakdown of GPT-2
-  Model"</a> by Vipul Koti.</em>
+  <em>The GPT-2 architecture and next-token prediction flow. Figure from
+  <a href="https://medium.com/@vipul.koti333/from-theory-to-code-step-by-step-implementation-and-code-breakdown-of-gpt-2-model-7bde8d5cecda">Vipul Koti's article</a>.</em>
 </p>
 
 - Core blocks built bottom-up: causal self-attention, GELU MLP, pre-LayerNorm
