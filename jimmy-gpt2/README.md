@@ -5,6 +5,28 @@ learning project to understand the internals of modern language models. It can
 load OpenAI's pretrained GPT-2 weights to generate text, and run a training
 forward pass that computes the language-modeling loss.
 
+<p align="center">
+  <img src="assets/GPT-2.webp" alt="GPT-2 architecture: token embedding and positional encoding feed 12 stacked transformer blocks, an output linear layer, and a softmax that predicts the next token" width="720">
+</p>
+
+<p align="center">
+  <em>GPT-2 architecture and next-token prediction flow. Figure from
+  <a href="https://medium.com/@vipul.koti333/from-theory-to-code-step-by-step-implementation-and-code-breakdown-of-gpt-2-model-7bde8d5cecda">
+  "From Theory to Code: Step-by-Step Implementation and Code Breakdown of GPT-2 Model"</a> by Vipul Koti.</em>
+</p>
+
+## Contents
+
+- [What's inside](#whats-inside)
+  - [Model architecture](#model-architecture)
+  - [Training & inference](#training--inference)
+  - [Pretrained weights](#pretrained-weights)
+  - [Data & utilities](#data--utilities)
+- [Project structure](#project-structure)
+- [Model configuration](#model-configuration)
+- [Getting started](#getting-started)
+- [Acknowledgements](#acknowledgements)
+
 ## What's inside
 
 I implement the core transformer building blocks step by step, verify each one with
@@ -39,6 +61,8 @@ The building blocks, composed bottom-up into the full model:
 ```
 .
 ├── train_gpt2.py                       # Full GPT-2 model + pretrained weight loading + forward-pass loss + text generation
+├── assets/
+│   └── GPT-2.webp                      # GPT-2 architecture diagram (see credit above)
 ├── datasets/
 │   └── input.txt                       # Training corpus (Tiny Shakespeare)
 └── notebooks/
@@ -80,3 +104,6 @@ This project follows Andrej Karpathy's video
 ["Let's reproduce GPT-2 (124M)"](https://www.youtube.com/watch?v=l8pRSuU81PU)
 (Jun 2024) and its companion repo
 [build-nanogpt](https://github.com/karpathy/build-nanogpt).
+
+The architecture diagram is from Vipul Koti's article
+["From Theory to Code: Step-by-Step Implementation and Code Breakdown of GPT-2 Model"](https://medium.com/@vipul.koti333/from-theory-to-code-step-by-step-implementation-and-code-breakdown-of-gpt-2-model-7bde8d5cecda).
