@@ -4,7 +4,17 @@
 
 A collection of deep-learning study projects I built during my time in the
 [Kolachalama Lab](https://vkola-lab.github.io/) at Boston University.
-The subprojects are mainly for large scale Transformer based model in Computer Vision and NLP field 
+The subprojects focus on large-scale Transformer-based models in the NLP and
+Computer Vision fields.
+
+## Contents
+
+- [Projects](#projects)
+  - [1. jimmy-gpt2: GPT-2 from scratch](#1-jimmy-gpt2-gpt-2-from-scratch) (NLP)
+  - [2. ViTransformer: Vision Transformer from scratch](#2-vitransformer-vision-transformer-from-scratch) (Computer Vision)
+- [Datasets](#datasets)
+- [Repository structure](#repository-structure)
+- [Setup](#setup)
 
 ## Projects
 ### NLP Side:
@@ -14,6 +24,20 @@ A from-scratch reimplementation of the GPT-2 transformer, weight-compatible
 with HuggingFace's pretrained checkpoints, following Andrej Karpathy's
 ["Let's reproduce GPT-2 (124M)"](https://www.youtube.com/watch?v=l8pRSuU81PU)
 video.
+
+<p align="center">
+  <img src="jimmy-gpt2/assets/GPT-2.webp" alt="GPT-2 architecture" width="720">
+</p>
+<p align="center">
+  <em>The GPT-2 architecture: input tokens are embedded, combined with
+  positional encodings, passed through 12 stacked transformer blocks (masked
+  multi-head attention, feed-forward network, LayerNorm, residual connections),
+  and projected to vocabulary logits whose softmax predicts the next token.
+  Figure from
+  <a href="https://medium.com/@vipul.koti333/from-theory-to-code-step-by-step-implementation-and-code-breakdown-of-gpt-2-model-7bde8d5cecda">"From
+  Theory to Code: Step-by-Step Implementation and Code Breakdown of GPT-2
+  Model"</a> by Vipul Koti.</em>
+</p>
 
 - Core blocks built bottom-up: causal self-attention, GELU MLP, pre-LayerNorm
   transformer block, and the full GPT model (token and positional embeddings,
@@ -97,6 +121,7 @@ ViT notebook runs, and used to train the ViT classifier.
 ├── requirements.txt
 ├── jimmy-gpt2/                 # GPT-2 reimplementation (see its README)
 │   ├── train_gpt2.py           # Full model, pretrained-weight loading, generation
+│   ├── assets/GPT-2.webp       # Architecture figure (credit: Vipul Koti, Medium)
 │   ├── datasets/input.txt      # Tiny Shakespeare corpus
 │   └── notebooks/              # Step-by-step walkthrough notebooks
 └── ViTransformer/
