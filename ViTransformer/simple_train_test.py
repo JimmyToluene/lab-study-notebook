@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torchvision.datasets.mnist import MNIST
 from torch.utils.data import DataLoader
-from vit.ViT import VisionTransformer
+from vit.ViT import ViTBackbone,ViTClassifier
 
 import numpy as np
 
@@ -38,7 +38,10 @@ test_loader = DataLoader(test_set, shuffle=False, batch_size=batch_size)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device, f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else "")
 
-transformer = VisionTransformer(d_model, n_classes, img_size, patch_size, n_channels, n_heads, n_layers).to(device)
+transformer = ViTClassifier(
+    ViTBackbone(d_model, n_classes, img_size, patch_size, n_channels, n_heads, n_layers),
+    n_classes
+).to(device)
 
 optimizer = Adam(transformer.parameters(), lr=alpha)
 criterion = nn.CrossEntropyLoss()

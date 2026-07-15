@@ -3,7 +3,7 @@ from .patch_embed import PatchEmbedding
 from .pos_encoding import PositionalEncoding
 from .transformer import TransformerEncoder
 
-class VisionTransformer(nn.Module):
+class ViTBackbone(nn.Module):
     def __init__(self, d_model, n_classes, img_size, patch_size, n_channels, n_heads, n_layers):
         super().__init__()
 
@@ -22,19 +22,18 @@ class VisionTransformer(nn.Module):
         self.patch_embedding = PatchEmbedding(self.d_model, self.img_size, self.patch_size, n_channels)
         self.positional_encoding = PositionalEncoding(self.d_model, self.max_seq_length)
         self.transformer_encoder = nn.Sequential(*[TransformerEncoder(self.d_model, self.n_heads) for _ in range(n_layers)])
-
-        # Classification ffn Head
-        self.classfier = nn.Sequential(
-            nn.Linear(self.d_model, self.n_classes),
-        )
+        self.ln_f = nn.LayerNorm(d_model)
 
     def forward(self, images):
         x = self.patch_embedding(images) # (B, P, dim_model)
-
         x = self.positional_encoding(x) # （B, max_token_length + 1, d_model)
-
         x = self.transformer_encoder(x)
+        return self.ln_f(x[:, 0])
 
-        x = self.classfier(x[:,0])
-
-        return x
+class ViTClassifier(nn.Module):
+    def __init__(self, backbone, n_classes):
+        super().__init__()
+        self.backbone = backbone
+        self.head = nn.Linear(backbone.d_model, n_classes)
+    def forward(self, images):
+        return self.head(self.backbone(images))

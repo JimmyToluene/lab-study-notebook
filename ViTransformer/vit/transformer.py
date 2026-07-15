@@ -1,13 +1,18 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+'''
+Parameter count in MultiHeadAttention:
+c_attn: 3 * d_model· * model + 3 * d_model = 3 * d_model * (d_model + 1)
+c_proj: d_model * d_model + d_model     = d_model * (d_model + 1)
+Total:  4 * d_model * (d_model + 1)
+'''
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, n_heads):
         super().__init__()
         assert d_model % n_heads == 0
         # key, query, value projection/weights for all heads, but in a batch
         self.c_attn = nn.Linear(d_model, 3 * d_model)
-
         # output projection
         self.c_proj = nn.Linear(d_model, d_model)        # regularization
         self.n_head = n_heads
@@ -26,7 +31,12 @@ class MultiHeadAttention(nn.Module):
         # output projection
         y = self.c_proj(y)
         return y
-
+'''
+Learnable parameter count in FFN:
+c_fc: r * d_model * d_model + r * d_model
+c_proj: r * d_model * d_model + d_model
+Total:  2 * r * d_model * d_model + (r + 1)·d_model
+'''
 class FFNN(nn.Module):
     def __init__(self, d_model, r_ffnn):
         super().__init__()
@@ -56,11 +66,8 @@ class TransformerEncoder(nn.Module):
         self.ffn = FFNN(d_model, r_ffnn)
 
     def forward(self, x):
-
         # Residual Connection After Sub-Layer 1
         x = x + self.attn(self.ln_1(x))
-
         # Residual Connection After Sub-Layer 2
         x = x + self.ffn(self.ln_2(x))
-
         return x

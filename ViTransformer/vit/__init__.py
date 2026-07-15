@@ -1,1 +1,1 @@
-from .ViT import VisionTransformer
+from .ViT import ViTBackbone,ViTClassifier
