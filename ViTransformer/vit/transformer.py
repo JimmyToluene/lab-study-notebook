@@ -1,5 +1,28 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+
+class DropPath(nn.Module):
+    """Stochastic depth: randomly zero the residual branch for whole samples.
+
+    During training, each sample's branch output is dropped with probability
+    `drop_prob` and the survivors are rescaled by 1/keep_prob so the expected
+    value is unchanged. A no-op at eval time or when drop_prob == 0.
+    """
+    def __init__(self, drop_prob: float = 0.0):
+        super().__init__()
+        self.drop_prob = drop_prob
+
+    def forward(self, x):
+        if self.drop_prob == 0.0 or not self.training:
+            return x
+        keep_prob = 1.0 - self.drop_prob
+        # one Bernoulli value per sample, broadcast over the other dims
+        shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+        mask = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
+        mask.floor_()
+        return x / keep_prob * mask
 
 '''
 Parameter count in MultiHeadAttention:
@@ -51,7 +74,7 @@ class FFNN(nn.Module):
         return x
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, d_model, n_heads, r_ffnn=4):
+    def __init__(self, d_model, n_heads, r_ffnn=4, drop_path=0.0):
         super().__init__()
         self.d_model = d_model
         self.n_heads = n_heads
@@ -64,10 +87,12 @@ class TransformerEncoder(nn.Module):
         self.ln_2 = nn.LayerNorm(d_model)
         # MLP layer
         self.ffn = FFNN(d_model, r_ffnn)
+        # Stochastic depth on each residual branch
+        self.drop_path = DropPath(drop_path)
 
     def forward(self, x):
         # Residual Connection After Sub-Layer 1
-        x = x + self.attn(self.ln_1(x))
+        x = x + self.drop_path(self.attn(self.ln_1(x)))
         # Residual Connection After Sub-Layer 2
-        x = x + self.ffn(self.ln_2(x))
+        x = x + self.drop_path(self.ffn(self.ln_2(x)))
         return x

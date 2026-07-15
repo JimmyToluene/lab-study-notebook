@@ -1,0 +1,18 @@
+name: mnist-baseline
+model:
+  d_model: 9
+  n_heads: 3
+  n_layers: 3
+  patch_size: [16, 16]
+  use_pe: true
+data:
+  dataset: mnist
+  img_size: [32, 32]
+  batch_size: 128
+  val_split: 0.1        # 10% of the 60k train set held out for validation
+train:
+  lr: 0.005
+  epochs: 5
+wandb:
+  enabled: false        # or pass --wandb on the CLI
+  project: vitransformer

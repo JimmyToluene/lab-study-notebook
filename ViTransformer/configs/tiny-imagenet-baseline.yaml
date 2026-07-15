@@ -1,0 +1,38 @@
+name: tiny-imagenet-baseline
+model:
+  d_model: 192          # DeiT-Tiny width
+  n_heads: 3            # 64-dim heads, the standard
+  n_layers: 6
+  patch_size: [8, 8]    # 64 patches; [4,4]=256 is better but 4x the attention cost
+  use_pe: true
+  drop_path: 0.1        # stochastic depth, linearly scaled 0 -> 0.1 across blocks
+data:
+  dataset: tiny-imagenet
+  img_size: [64, 64]
+  batch_size: 256
+  val_split: 0.1        # carved from train; official val/ is used as the test split
+train:
+  lr: 0.0005            # AdamW peak LR after warmup
+  epochs: 200           # augmentation slows memorization -> needs a long schedule
+  weight_decay: 0.05
+  label_smoothing: 0.1  # folded into Mixup when it is active
+  scheduler: cosine
+  warmup_epochs: 20
+  min_lr: 0.00001
+  grad_clip: 1.0
+  patience: 30          # early-stop if val acc stalls for 30 epochs
+aug:
+  normalize: true
+  hflip: true
+  crop_padding: 8       # RandomCrop(64, padding=8)
+  rand_augment: true
+  randaug_num_ops: 2
+  randaug_magnitude: 9
+  random_erase: 0.25
+  mixup: 0.8            # Beta(0.8, 0.8)
+  cutmix: 1.0           # Beta(1.0, 1.0)
+  mixup_prob: 1.0
+  mixup_switch_prob: 0.5
+wandb:
+  enabled: true
+  project: vit-tiny-imagenet

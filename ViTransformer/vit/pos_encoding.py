@@ -3,12 +3,15 @@ import torch
 import numpy as np
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, d_model, max_seq_length):
+    def __init__(self, d_model, max_seq_length, use_pe=True):
         super().__init__()
-        # Create a learnable parameter named classification token([CLS])
+        # The CLS token is prepended unconditionally: the backbone classifies
+        # from x[:, 0], so it must always exist regardless of `use_pe`.
         self.cls_token = nn.Parameter(torch.randn(1, 1, d_model)) # (1, 1, d_model)
-        # Create a learnable positional encoding parameter (ViT paper)
-        self.pe = nn.Parameter(torch.randn(1,max_seq_length, d_model))
+        # `use_pe` toggles only the *learned positional embedding* (ViT paper).
+        self.use_pe = use_pe
+        if use_pe:
+            self.pe = nn.Parameter(torch.randn(1, max_seq_length, d_model))
         '''
         # Creating positional encodings
         pe = torch.zeros(max_seq_length, d_model) # (max_seq_length, d_model)
@@ -32,6 +35,7 @@ class PositionalEncoding(nn.Module):
 
         # Adding positional encoding to embeds
         # Input x: (B, n_patches + 1, d_model) — (128, 5, 9), self.pe: (1, max_seq_length, d_model)
-        x = x + self.pe # -> (B, max_token_length + 1, d_model)
+        if self.use_pe:
+            x = x + self.pe # -> (B, max_token_length + 1, d_model)
 
         return x
