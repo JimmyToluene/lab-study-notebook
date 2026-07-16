@@ -22,7 +22,7 @@ class ModelConfig:
     n_layers: int
     patch_size: Tuple[int, int]
     use_pe: bool = True   # learned positional embedding (the CLS token is always kept)
-    r_ffnn: int = 4       # FFN expansion ratio inside each encoder block
+    r_ffn: int = 4       # FFN expansion ratio inside each encoder block
     drop_path: float = 0.0  # max stochastic-depth rate (linearly scaled across layers)
 
 

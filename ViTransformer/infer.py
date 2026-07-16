@@ -13,7 +13,9 @@ import argparse
 import torch
 from PIL import Image
 
-from engine import build_transform, describe_device, get_device, get_spec, load_model
+from engine import (
+    build_transform, describe_device, get_device, get_labels, get_spec, load_model,
+)
 
 
 def main():
@@ -32,6 +34,11 @@ def main():
     pil_mode = "L" if spec.n_channels == 1 else "RGB"
     k = min(args.topk, spec.n_classes)
 
+    labels = get_labels(cfg)
+    if labels is None:
+        print(f"Class names unavailable for '{cfg.data.dataset}' under "
+              f"'{cfg.data.root}'; showing raw class indices.")
+
     for path in args.images:
         img = Image.open(path).convert(pil_mode)
         x = transform(img).unsqueeze(0).to(device)  # (1, C, H, W)
@@ -42,7 +49,8 @@ def main():
         confs, idxs = probs.topk(k)
         print(f"\n{path}")
         for conf, idx in zip(confs.tolist(), idxs.tolist()):
-            print(f"  class {idx:>3}: {100 * conf:5.2f}%")
+            name = f"{labels[idx]} " if labels else ""
+            print(f"  {name}(class {idx:>3}): {100 * conf:5.2f}%")
 
 
 if __name__ == "__main__":

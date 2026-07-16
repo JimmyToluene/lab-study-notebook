@@ -33,6 +33,9 @@ class PositionalEncoding(nn.Module):
 
         # Adding positional encoding to embeds
         # Input x: (B, n_patches + 1, d_model) — (128, 5, 9), self.pe: (1, max_seq_length, d_model)
-        x = x + self.pe # -> (B, max_token_length + 1, d_model)
+        # Skipped entirely when use_pe=False: `self.pe` does not exist in that
+        # case, and self-attention is then permutation-invariant over patches.
+        if self.use_pe:
+            x = x + self.pe # -> (B, max_token_length + 1, d_model)
 
         return x

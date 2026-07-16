@@ -27,7 +27,7 @@ def build_model(cfg: Config, spec: DatasetSpec, device: torch.device) -> ViTClas
         n_heads=m.n_heads,
         n_layers=m.n_layers,
         use_pe=m.use_pe,
-        r_ffnn=m.r_ffnn,
+        r_ffn=m.r_ffn,
         drop_path=m.drop_path,
     )
     model = ViTClassifier(backbone, spec.n_classes)

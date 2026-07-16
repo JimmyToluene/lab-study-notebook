@@ -11,14 +11,15 @@ Two things worth calling out:
 2. ``n_channels`` / ``n_classes`` / ``mean`` / ``std`` belong to the dataset,
    not the config, so they live on ``DatasetSpec`` here.
 
-To add a dataset: write a builder and register it in ``DATASETS``.
+To add a dataset: write a builder and a labels function, then register both in
+``DATASETS``.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import torch
 import torchvision.transforms as T
@@ -37,6 +38,10 @@ class DatasetSpec:
     std: Tuple[float, ...]
     # builder(root, img_size, transform, train) -> Dataset
     builder: Callable[[str, Tuple[int, int], T.Compose, bool], Dataset]
+    # labels(root) -> human-readable name per class index, or None if the names
+    # cannot be recovered (e.g. inference from a checkpoint with no dataset on
+    # disk). Index i must match what the builder's Dataset assigns to class i.
+    labels: Callable[[str], Optional[List[str]]]
 
 
 def _build_eval_transform(cfg: Config, spec: DatasetSpec) -> T.Compose:
@@ -80,6 +85,11 @@ def _build_mnist(root, img_size, transform, train):
     return MNIST(root=root, train=train, download=True, transform=transform)
 
 
+def _mnist_labels(root):
+    # MNIST targets are the digits themselves, so the index *is* the label.
+    return [str(d) for d in range(10)]
+
+
 def _build_tiny_imagenet(root, img_size, transform, train):
     # Expects <root>/tiny-imagenet-200/{train,val} in ImageFolder layout.
     # The official val/ split must be reorganized into per-class subdirs first
@@ -95,16 +105,44 @@ def _build_tiny_imagenet(root, img_size, transform, train):
     return ImageFolder(str(path), transform=transform)
 
 
+def _tiny_imagenet_labels(root):
+    base = Path(root) / "tiny-imagenet-200"
+
+    # ImageFolder numbers classes by *sorted* dir name, so the order must come
+    # from sorting -- wnids.txt is not stored in sorted order and using its file
+    # order here would mislabel every prediction.
+    train = base / "train"
+    if train.is_dir():
+        wnids = sorted(p.name for p in train.iterdir() if p.is_dir())
+    elif (base / "wnids.txt").is_file():
+        wnids = sorted((base / "wnids.txt").read_text().split())
+    else:
+        return None   # no dataset on disk; caller falls back to raw indices
+
+    # words.txt is the full WordNet table (~82k rows), not just these 200:
+    # <wnid>\t<comma-separated synonyms>. Keep the first synonym.
+    words = base / "words.txt"
+    if not words.is_file():
+        return wnids
+    names = {}
+    for line in words.read_text().splitlines():
+        wnid, _, synonyms = line.partition("\t")
+        names[wnid] = synonyms.split(",")[0].strip()
+    return [names.get(w, w) for w in wnids]
+
+
 DATASETS = {
     "mnist": DatasetSpec(
         n_channels=1, n_classes=10,
         mean=(0.1307,), std=(0.3081,),
         builder=_build_mnist,
+        labels=_mnist_labels,
     ),
     "tiny-imagenet": DatasetSpec(
         n_channels=3, n_classes=200,
         mean=(0.4802, 0.4481, 0.3975), std=(0.2770, 0.2691, 0.2821),
         builder=_build_tiny_imagenet,
+        labels=_tiny_imagenet_labels,
     ),
 }
 
@@ -113,6 +151,17 @@ def get_spec(dataset: str) -> DatasetSpec:
     if dataset not in DATASETS:
         raise KeyError(f"Unknown dataset '{dataset}'. Known: {sorted(DATASETS)}")
     return DATASETS[dataset]
+
+
+def get_labels(cfg: Config) -> Optional[List[str]]:
+    """Class names indexed by model output index, or None if unavailable."""
+    spec = get_spec(cfg.data.dataset)
+    labels = spec.labels(cfg.data.root)
+    if labels is not None and len(labels) != spec.n_classes:
+        # A partial dataset dir would silently shift every name onto the wrong
+        # index. Showing raw indices is better than showing confident lies.
+        return None
+    return labels
 
 
 def build_transform(cfg: Config) -> T.Compose:
