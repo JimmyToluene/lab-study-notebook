@@ -12,11 +12,11 @@ import torch
 
 def train_one_epoch(model, loader, optimizer, criterion, device,
                     mixup_fn=None, grad_clip=0.0) -> float:
-    """Run one pass over ``loader``; return the mean per-batch loss.
+    """
+    Run one pass over ``loader``; return the mean per-batch loss.
 
-    When ``mixup_fn`` is given it turns (inputs, labels) into (mixed inputs,
-    soft targets) and ``criterion`` must be a soft-target loss. ``grad_clip``
-    > 0 clips the gradient norm before the optimizer step.
+    When ``mixup_fn`` is given it turns (inputs, labels) into (mixed inputs,soft targets)
+    and ``criterion`` must be a soft-target loss. ``grad_clip`` > 0 clips the gradient norm before the optimizer step.
     """
     model.train()
     running_loss = 0.0
@@ -42,8 +42,8 @@ def train_one_epoch(model, loader, optimizer, criterion, device,
 def evaluate(model, loader, device, criterion=None):
     """Evaluate over ``loader``; return ``(mean_loss, accuracy)``.
 
-    ``mean_loss`` is None when no ``criterion`` is passed (e.g. test.py only
-    cares about accuracy); accuracy is a fraction in [0, 1].
+    ``mean_loss`` is None when no ``criterion`` is passed (e.g. test.py only cares about accuracy);
+    accuracy is a fraction in [0, 1].
     """
     model.eval()
     correct = 0

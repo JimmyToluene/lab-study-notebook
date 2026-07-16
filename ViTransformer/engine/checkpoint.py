@@ -1,10 +1,9 @@
-"""Minimal checkpoint I/O.
+"""
+Checkpoint I/O.
 
-Deliberately bare: one ``torch.save`` of the weights plus the config that
-produced them. No optimizer state, no best/last tracking, no resume -- those
-are the "full-featured" extras we chose to skip. Persisting the config is the
-one non-negotiable: it is what lets test.py / infer.py rebuild the exact
-architecture from a checkpoint file with no config flag.
+A checkpoint is a single ``torch.save`` payload: {"model": state_dict, "config": cfg dict}.
+Persisting the config lets load_model() rebuild the exact architecture from the file alone.
+Does not save optimizer state, so training cannot resume mid-run.
 """
 
 from __future__ import annotations

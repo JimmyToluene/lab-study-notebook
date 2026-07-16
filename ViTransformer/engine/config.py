@@ -1,9 +1,9 @@
-"""Typed configuration loaded from the YAML files in ``configs/``.
+"""
+Typed configuration loaded from the YAML files in ``configs/``.
 
-The whole point of this module is to be the *single* place that knows the
-shape of a config file. Everything downstream (data, model, training loop)
-receives a typed ``Config`` object instead of reaching into raw dicts or,
-worse, reading module-level globals the way ``simple_train_test.py`` did.
+This module is the single source of truth for config-file structure.
+Downstream code (data, model, training loop) receives a ``Config``object;
+nothing else should parse the YAML directly.
 """
 
 from __future__ import annotations

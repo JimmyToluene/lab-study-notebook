@@ -1,4 +1,4 @@
-"""Weights & Biases logging, wrapped so it degrades gracefully.
+"""Weights & Biases logging
 
 The rest of the code calls ``tracker.log(...)`` unconditionally; this wrapper
 turns that into a no-op when W&B is disabled in the config, not installed, or

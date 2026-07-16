@@ -8,14 +8,13 @@ class PatchEmbedding(nn.Module):
     self.patch_size = patch_size # Patch Size
     self.n_channels = n_channels # Number of Channels
 
-    '''
-    nn.Conv2d is an learnable parameter which register its weight and bias as 'nn.Parameter',
-      weight: shape(d_model, n_channels, patch_size, patch_size)
-        It flattening each patch into a vec of length `n_channels * patch_size^2` and multiplying by
-        a learned (d_mode;. n_channels * patch_size ** 2) matrix
-      bias: shape(d_model,)
-      Parameter count: d_model * n_channels * patch_size² + d_model
-    '''
+    """
+    Learnable parameter nn.Conv2d which register its weight and bias as 'nn.Parameter',
+    Parameter count: d_model * n_channels * patch_size² + d_model
+    weight: shape(d_model, n_channels, patch_size, patch_size)
+      It flattening each patch into a vec of length `n_channels * patch_size^2` and multiplying by a learned (d_mode;. n_channels * patch_size ** 2) matrix
+    bias: shape(d_model,)
+    """
     self.linear_project = nn.Conv2d(
       self.n_channels,
       self.d_model,

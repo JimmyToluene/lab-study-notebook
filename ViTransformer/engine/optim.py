@@ -11,10 +11,12 @@ from .config import Config
 
 
 def build_optimizer(model, cfg: Config) -> AdamW:
-    """AdamW with weight decay applied only to matrix weights.
+    """
+    AdamW with weight decay applied only to matrix weights.
 
-    Norm/bias/embedding params (anything 1-D, plus the CLS token and positional
-    embedding) are excluded from weight decay -- the standard ViT convention.
+    Norm/bias/embedding params (anything 1-D, plus the CLS token and positional embedding)
+    are excluded from weight decay
+    Follow the standard ViT convention.
     """
     decay, no_decay = [], []
     for name, p in model.named_parameters():

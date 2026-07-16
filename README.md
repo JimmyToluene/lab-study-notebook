@@ -51,7 +51,7 @@ and usage.
 #### 2. [ViTransformer](ViTransformer/): Vision Transformer from scratch
 
 Study notes on the Vision Transformer ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929)),
-built up module by module in [`ViT_notes.ipynb`](ViTransformer/scratch_nbs/ViT_notes.ipynb)
+built up module by module in [`ViT_notes.ipynb`](ViTransformer/notebooks/ViT_notes.ipynb)
 and trained end to end on MNIST. The building blocks and the full model are
 extracted into an importable [`vit/`](ViTransformer/vit/) package (patch
 embedding, positional encoding, transformer encoder, and the assembled
@@ -94,7 +94,7 @@ pre-LayerNorm residual connections, stacked into encoder blocks.
 **Classification**\
 The full `VisionTransformer` classifies from the `[CLS]` token, with the
 classification head returning raw logits for `CrossEntropyLoss`.
-[`simple_train_test.py`](ViTransformer/simple_train_test.py) trains the model
+[`simple_train_test.py`](ViTransformer/notebooks/simple_train_test.py) trains the model
 on MNIST and evaluates test accuracy after every epoch; a small config
 (3 layers, 3 heads) trained for 5 epochs reaches **92% test accuracy**.
 
