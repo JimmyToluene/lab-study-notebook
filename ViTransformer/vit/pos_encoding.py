@@ -11,9 +11,7 @@ class PositionalEncoding(nn.Module):
         if use_pe:
             self.pe = nn.Parameter(torch.randn(1, max_seq_length, d_model))
         """
-        # Creating positional encodings
-        pe = torch.zeros(max_seq_length, d_model) # (max_seq_length, d_model)
-        # Sinusoidal Positional Embeddings
+        Sinusoidal Positional Embeddings
         for pos in range(max_seq_length):
             for i in range(d_model):
                 if i % 2 == 0:

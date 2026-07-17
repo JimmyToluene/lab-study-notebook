@@ -1,3 +1,5 @@
+import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -19,6 +21,26 @@ class MultiHeadAttention(nn.Module):
         self.n_head = n_heads
         self.d_model = d_model
 
+        # Attention-map capture, off by default so training never pays for it.
+        # `F.scaled_dot_product_attention` returns only its output tensor: no
+        # backend hands back the (B, nh, T, T) probabilities, so the map cannot
+        # be recovered from the fast path at all -- not even by forcing the MATH
+        # backend, which builds the matrix internally and then drops it. Setting
+        # `store_attn = True` swaps in the eager path below, which is the same
+        # math unfused, and keeps a reference to the matrix on `attn_map`.
+        self.store_attn = False
+        self.attn_map = None   # (B, nh, T, T) after a forward with store_attn=True
+
+    def _eager_attention(self, q, k, v):
+        """Unfused attention. Identical math to F.scaled_dot_product_attention
+        (same 1/sqrt(head_size) scale, no mask), but the probability matrix is
+        materialized so it can be stashed for visualization."""
+        att = (q @ k.transpose(-2, -1)) / math.sqrt(k.size(-1)) # (B, nh, T, T)
+        att = att.softmax(dim=-1)
+        # Detached: this is a diagnostic, it must never hold the graph alive.
+        self.attn_map = att.detach()
+        return att @ v # (B, nh, T, hs)
+
     def forward(self, x):
         B, T, C = x.size() # Batch size, sequence length, embedding dimensionality (n_embd)
         qkv = self.c_attn(x)
@@ -26,8 +48,12 @@ class MultiHeadAttention(nn.Module):
         k = k.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
         q = q.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
         v = v.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
-        # We adpot FlashAttention here.
-        y = F.scaled_dot_product_attention(q, k, v, is_causal=False)
+        if self.store_attn:
+            y = self._eager_attention(q, k, v)
+        else:
+            # PyTorch picks the backend from dtype/shape: FlashAttention needs
+            # fp16/bf16, so these fp32 configs get mem-efficient or math.
+            y = F.scaled_dot_product_attention(q, k, v, is_causal=False)
         y = y.transpose(1,2).contiguous().view(B,T,C) # re-assemble all head outputs side by side
         # output projection
         y = self.c_proj(y)

@@ -27,3 +27,7 @@ Thumbs.db
 # MNIST download from the ViT notebook (repo root only;
 # Jimmy-gpt2/datasets stays tracked)
 /datasets/
+
+# Ablation scratch space: attention-map dumps, use_pe sweeps, plots.
+# Throwaway experiment output -- results worth keeping belong in the README.
+ablation/
