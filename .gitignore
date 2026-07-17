@@ -28,6 +28,11 @@ Thumbs.db
 # Jimmy-gpt2/datasets stays tracked)
 /datasets/
 
+# blog content
+blog/
+wandb/
+runs/
+
 # Ablation scratch space: attention-map dumps, use_pe sweeps, plots.
 # Throwaway experiment output -- results worth keeping belong in the README.
 ablation/
