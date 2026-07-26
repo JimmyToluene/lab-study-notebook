@@ -1,13 +1,13 @@
+import inspect
 import math
 from dataclasses import dataclass
 import torch
 import torch.nn as nn
+from torch._dynamo.variables import optimizer
 from torch.nn import functional as F
 
 # ---------------------------------------------------------------
-
 class CausalSelfAttention(nn.Module):
-
     def __init__(self, config):
         super().__init__()
         assert config.n_embd % config.n_head == 0 # embedding dimension must be divisible by the number of heads
@@ -33,6 +33,7 @@ class CausalSelfAttention(nn.Module):
         q = q.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
         v = v.view(B,T,self.n_head,C // self.n_head).transpose(1,2) # (B, nh, T, hs)
 
+        "Vanilla attention implementation, causal mask and softmax"
         # attention (T,T) matrix for all the queries and keys
         # att = q @ k.transpose(-2, -1) * (1.0 / math.sqrt(k.size(-1)))
         # Apply the causal mask (predict next token model only mask)
@@ -40,6 +41,8 @@ class CausalSelfAttention(nn.Module):
         # Apply softmax on last dim of attention matrix
         # att = F.softmax(att,dim=-1)
         # y = att @ v # (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+
+        "Flash attention implementation, w/ causal mask"
         y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         y = y.transpose(1,2).contiguous().view(B,T,C) # re-assemble all head outputs side by side
         # output projection
@@ -47,7 +50,6 @@ class CausalSelfAttention(nn.Module):
         return y
 
 class MLP(nn.Module):
-
     def __init__(self, config):
         super().__init__()
         self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd)
@@ -62,7 +64,6 @@ class MLP(nn.Module):
         return x
 
 class Block(nn.Module):
-
     def __init__(self, config):
         super().__init__()
         self.ln_1 = nn.LayerNorm(config.n_embd)
@@ -181,7 +182,29 @@ class GPT(nn.Module):
 
         return model
 
-# -------------------------------------------------------------------------------------------------------------------------------------------------
+    def configure_optimizers(self, weight_decay, learning_rate, device):
+        # Start w/ all of the candidate parameters (require grad)
+        param_dict = {pn: p for pn, p in self.named_parameters()}
+        param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
+        # create optim groups, Any parameters that is 2D will be weight decayed, otherwise no.
+        # i.e. All weight tensor's in matmuls + embeddings decay, all bias and LayerNorm layer don't
+        decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
+        nodecay_params = [p for n,p in param_dict.items() if p.dim() < 2]
+        optim_groups = [
+            {'params':decay_params,'weight_decay':weight_decay},
+            {'params':nodecay_params,'weight_decay':0.0}
+        ]
+        num_decay_params = sum(p.numel() for p in decay_params)
+        num_nodecay_params = sum(p.numel() for p in nodecay_params)
+        print(f"num decayed parameter tensors: {len(decay_params)}, with {num_decay_params} parameters")
+        print(f"num nodecayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params} parameters")
+        # Create AdamW optimizer and use the fused version if it is avilable
+        fused_available = "fused" in inspect.signature(torch.optim.AdamW).parameters
+        use_fused = fused_available and 'cuda' in device
+        print(f"using fused AdamW: {use_fused}")
+        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
+        return optimizer
+# ------------------------------------------------------------------------------
 import tiktoken
 class DataLoaderLite:
     def __init__(self, B, T):
@@ -214,6 +237,7 @@ class DataLoaderLite:
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 import time
+
 # Autodetect the avail devices
 device = "cpu"
 if torch.cuda.is_available():
@@ -226,19 +250,32 @@ torch.manual_seed(1337)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(1337)
 
-train_loader = DataLoaderLite(B=16,T=1024)
+total_batch_size = 524288 # 2**19, ~0.5M, in number of tokens
+B = 16 # Mirco batch size
+T = 1024 # Sequence length
+assert total_batch_size % (B * T) == 0, f"Total batch size ({total_batch_size}) must be divisible by micro batch size ({B * T})"
+grad_accum_steps = total_batch_size // (B * T)
+print(f"Total desired batch size: {total_batch_size}")
+print(f"=> calculated gradient accumulation steps: {grad_accum_steps}")
+
+train_loader = DataLoaderLite(B,T)
 
 torch.set_float32_matmul_precision('high')
 
 # get logits
 model = GPT(GPTConfig(vocab_size=50304))
 model.to(device)
-model = torch.compile(model) # torch.comile() like gcc for c, it compiles the whole model into a single object, and send to interpreter
+# torch.comile() like gcc for c,
+# it compiles the whole model into a single object, and send to interpreter
+model = torch.compile(model)
 
+# The learning rate in here is highly variant.
+# Learning rate is one of critical recipe in LM training
 max_lr = 6e-4
 min_lr = max_lr * 0.1
 warmup_steps = 10
 max_steps = 50
+
 def get_lr(it):
     # 1: linear warmup for warmup_iters steps
     if it < warmup_steps:
@@ -252,16 +289,18 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff starts at 1 and goes to 0
     return min_lr + coeff * (max_lr - min_lr)
 
-# Optimize
-optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, betas=(0.9, 0.95), eps=1e-8)
+# Optimize:
+# optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, betas=(0.9, 0.95), eps=1e-8)
+optimizer = model.configure_optimizers(weight_decay=0.1, learning_rate=6e-4, device=device)
 for step in range(max_steps):
     t0 = time.time()
-    x, y = train_loader.next_batch()
-    x, y = x.to(device), y.to(device)
-    optimizer.zero_grad()
-    with torch.autocast(device_type=device, dtype=torch.bfloat16):
-        logits, loss = model(x,y)
-    loss.backward()
+    for micro_step in range(grad_accum_steps):
+        x, y = train_loader.next_batch()
+        x, y = x.to(device), y.to(device)
+        optimizer.zero_grad()
+        with torch.autocast(device_type=device, dtype=torch.bfloat16):
+            logits, loss = model(x,y)
+        loss.backward()
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0) # Calculate global norm for all parameters, prevent the model get too big shocks.
     # determine and set the learning rate for this iteration
     lr = get_lr(step)
