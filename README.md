@@ -58,11 +58,6 @@ embedding, positional encoding, transformer encoder, and the assembled
 `ViTBackbone` / `ViTClassifier`), so training scripts can simply do
 `from vit import ViTBackbone, ViTClassifier`.
 
-Everything *around* the model — YAML config parsing, dataset registry and
-transforms, train/eval loops, checkpointing, Mixup/CutMix, optimizers and
-schedulers, W&B logging — lives in [`engine/`](ViTransformer/engine/), so the
-`vit/` package stays a clean architecture reference. Training is driven by
-configs in [`configs/`](ViTransformer/configs/) rather than edited constants:
 
 ```bash
 python train.py --config configs/mnist-baseline.yaml
@@ -80,39 +75,6 @@ python infer.py --ckpt runs/mnist-baseline/best.pt a.png b.png --topk 3
   embeddings and a learnable [class] token, fed through a standard transformer
   encoder, and classified from the [class] token by an MLP head.</em>
 </p>
-
-**Patch embedding**\
-A strided `Conv2d` that maps an image `(B, C, H, W)` to a token sequence
-`(B, num_patches, d_model)`, with visualizations of the image cut into patches
-and a PCA-to-RGB view of the resulting embeddings.
-
-**Positional encoding**\
-A learnable `[CLS]` token prepended to the sequence, plus a **learnable**
-position embedding — a `nn.Parameter` of shape `(1, n_patches + 1, d_model)`
-added to the tokens, which is what ViT itself uses. Without it self-attention is
-permutation-invariant and the model cannot tell one patch position from another.
-The `use_pe` flag turns it off to make that ablation easy to run.
-
-The sinusoidal alternative from "Attention Is All You Need" is kept in the
-module as a commented-out reference:
-
-$$
-PE_{(pos,\,2k)} = \sin\!\left(\frac{pos}{10000^{2k/d_{model}}}\right), \qquad
-PE_{(pos,\,2k+1)} = \cos\!\left(\frac{pos}{10000^{2k/d_{model}}}\right)
-$$
-
-Each position $pos$ gets a fixed vector of interleaved sines and cosines at
-geometrically decreasing frequencies, added to the token embedding at the
-input: $\text{x'}_{pos} = x_{pos} + PE_{pos}$.
-
-**Transformer encoder**\
-Multi-head self-attention (batched QKV projection,
-`scaled_dot_product_attention` without a causal mask — the one line that
-separates this from the causal attention in jimmy-gpt2), a GELU feed-forward
-network with an `r_ffn` expansion ratio, and pre-LayerNorm residual connections,
-stacked into encoder blocks. Each residual branch is wrapped in `DropPath`
-(stochastic depth), whose rate scales linearly from 0 at the first block to
-`drop_path` at the last, following the DeiT/timm schedule.
 
 **Classification**\
 `ViTBackbone` runs the stack and returns the final-LayerNorm'd `[CLS]` token;
