@@ -1,4 +1,4 @@
-# Study Notebook
+# Study Notebook for Transformer-based model
 
 A collection of deep-learning study projects I built during my time in the
 [Kolachalama Lab](https://vkola-lab.github.io/) at Boston University.
