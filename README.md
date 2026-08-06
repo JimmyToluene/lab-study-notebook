@@ -1,13 +1,9 @@
 # Study Notebook
 
-**Author:** Haozhe (Jimmy) Jia, Boston University
-
 A collection of deep-learning study projects I built during my time in the
 [Kolachalama Lab](https://vkola-lab.github.io/) at Boston University.
 The subprojects focus on large-scale Transformer-based models in the NLP and
 Computer Vision fields.
-
-## Contents
 
 - [Projects](#projects)
   - [1. jimmy-gpt2: GPT-2 from scratch](#1-jimmy-gpt2-gpt-2-from-scratch) (NLP)
